@@ -1,54 +1,31 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser')
+const cors = require('cors')
+const dbConnect = require('./utils/dbConnect');
+const getTodolist = require('./controllers/getTodolist');
+const deleteTask = require('./controllers/deleteTask');
+const editTask = require('./controllers/editTask');
+const addTask = require('./controllers/addTask');
+require("dotenv").config();
 
 
 const PORT = 4000;
 
-let todolist = [
-    {
-        content: 'Buy milk',
-        id: 'x7',
-        checked: false,
-    },
-    {
-        content: 'Get Ice creamm',
-        id: 'x5',
-        checked: true,
-    }, {
-        content: 'Get Poweaaaaa',
-        id: 'x778',
-        checked: true,
-    }
-];
+app.use(cors())
 
 app.use(bodyParser.json());
 
-app.get('/todolist', (req, res, next) => {
-    res.json({ todolist });
-});
+app.get('/todolist', getTodolist);
 
-app.post('/posttodo', (req, res, next) => {
-    const { todo } = req.body;
-    if (todo) {
-        todolist.push(todo);
-    }
+app.post('/posttodo', addTask);
 
-    res.json({ todolist });
-});
+app.patch('/deletetodo', deleteTask);
 
-app.post('/deletetodo', (req, res, next) => {
-    const { id } = req.body;
-    console.log('id of todo', id)
-    if (id) {
-        todolist = todolist.filter(todo => todo.id !== id);
-    }
-
-    res.status(201).json({ todolist, success: true });
-
-})
+app.patch('/edittodo', editTask)
 
 
 app.listen(PORT, () => {
     console.log(`Server is on ${PORT}`);
+    dbConnect();
 });
